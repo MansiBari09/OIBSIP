@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Temperature Converter</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #f5f3ee;
+      --surface:  #ffffff;
+      --border:   #e0ddd5;
+      --text:     #1a1a18;
+      --muted:    #7a7970;
+      --accent:   #d95f2b;
+      --accent-bg:#fdf0e9;
+      --mono:     'DM Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .title {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 400;
+      background: var(--accent-bg);
+      color: var(--accent);
+      padding: 0.3rem 0.7rem;
+      border-radius: 2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .field-group { margin-bottom: 1.25rem; }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input[type="number"]:focus, select:focus {
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    input[type="number"]::placeholder { color: #bbb; }
+
+    input[type="number"].error-input {
+      border-color: #e24b4a;
+      background: #fff5f5;
+    }
+
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+
+    .swap-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      flex-shrink: 0;
+      width: 48px;
+    }
+    .swap-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    .error-msg {
+      font-size: 0.78rem;
+      color: #e24b4a;
+      min-height: 1.2rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.6rem;
+      font-family: var(--sans);
+    }
+
+    .convert-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .convert-btn:hover { background: #c44e20; }
+    .convert-btn:active { transform: scale(0.98); }
+
+    /* Result area */
+    .result-area {
+      margin-top: 1.75rem;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-main {
+      background: var(--accent-bg);
+      border: 1.5px solid rgba(217,95,43,0.2);
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .result-from {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    .result-number {
+      font-family: var(--mono);
+      font-size: 3rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .result-unit-label {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .others-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      text-align: center;
+    }
+
+    .mini-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+
+    .mini-value {
+      font-family: var(--mono);
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    /* select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--muted);
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.75rem 1.5rem; }
+      .result-number { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="title">temp. converter</div>
+    <span class="badge">C · F · K</span>
+  </div>
+
+  <!-- Input -->
+  <div class="field-group">
+    <label>Temperature</label>
+    <input
+      type="number"
+      id="tempInput"
+      placeholder="Enter a value"
+      step="any"
+      oninput="clearError()"
+      onkeydown="if(event.key==='Enter') convert()"
+    />
+  </div>
+
+  <!-- Units row -->
+  <div class="field-group">
+    <label>From → To</label>
+    <div class="row">
+      <div class="select-wrap">
+        <select id="fromUnit" onchange="syncUnits('from')">
+          <option value="C">Celsius °C</option>
+          <option value="F">Fahrenheit °F</option>
+          <option value="K">Kelvin K</option>
+        </select>
+      </div>
+      <button class="swap-btn" onclick="swapUnits()" title="Swap units">⇄</button>
+      <div class="select-wrap">
+        <select id="toUnit" onchange="syncUnits('to')">
+          <option value="F">Fahrenheit °F</option>
+          <option value="C">Celsius °C</option>
+          <option value="K">Kelvin K</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="errMsg"></div>
+
+  <button class="convert-btn" onclick="convert()">Convert →</button>
+
+  <!-- Result -->
+  <div class="result-area" id="resultArea">
+    <div class="divider"></div>
+    <div class="result-main">
+      <div class="result-from" id="resultFrom"></div>
+      <div class="result-number" id="resultNumber">—</div>
+      <div class="result-unit-label" id="resultUnitLabel"></div>
+    </div>
+    <div class="others-grid" id="othersGrid"></div>
+  </div>
+</div>
+
+<script>
+  const sym  = { C: '°C', F: '°F', K: 'K' };
+  const name = { C: 'Celsius', F: 'Fahrenheit', K: 'Kelvin' };
+
+  function toCelsius(v, from) {
+    if (from === 'C') return v;
+    if (from === 'F') return (v - 32) * 5 / 9;
+    if (from === 'K') return v - 273.15;
+  }
+  function fromCelsius(c, to) {
+    if (to === 'C') return c;
+    if (to === 'F') return c * 9 / 5 + 32;
+    if (to === 'K') return c + 273.15;
+  }
+  function fmt(n) {
+    return parseFloat(n.toFixed(2)).toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+
+  function clearError() {
+    document.getElementById('errMsg').textContent = '';
+    document.getElementById('tempInput').classList.remove('error-input');
+  }
+
+  function syncUnits(changed) {
+    const from = document.getElementById('fromUnit');
+    const to   = document.getElementById('toUnit');
+    if (from.value === to.value) {
+      const all = ['C','F','K'];
+      const other = changed === 'from'
+        ? all.find(u => u !== from.value)
+        : all.find(u => u !== to.value);
+      if (changed === 'from') to.value = other;
+      else from.value = other;
+    }
+  }
+
+  function swapUnits() {
+    const from = document.getElementById('fromUnit');
+    const to   = document.getElementById('toUnit');
+    [from.value, to.value] = [to.value, from.value];
+    const resultArea = document.getElementById('resultArea');
+    if (resultArea.style.display === 'block') convert();
+  }
+
+  function convert() {
+    const raw  = document.getElementById('tempInput').value.trim();
+    const from = document.getElementById('fromUnit').value;
+    const to   = document.getElementById('toUnit').value;
+    const errEl = document.getElementById('errMsg');
+    const inp   = document.getElementById('tempInput');
+
+    if (raw === '') {
+      errEl.textContent = 'Please enter a temperature value.';
+      inp.classList.add('error-input'); return;
+    }
+    const val = parseFloat(raw);
+    if (isNaN(val)) {
+      errEl.textContent = 'That doesn\'t look like a number — try again.';
+      inp.classList.add('error-input'); return;
+    }
+    if (from === 'K' && val < 0) {
+      errEl.textContent = 'Kelvin cannot be negative (absolute zero = 0 K).';
+      inp.classList.add('error-input'); return;
+    }
+    if (from === 'C' && val < -273.15) {
+      errEl.textContent = 'Below absolute zero (−273.15°C) — not physically possible.';
+      inp.classList.add('error-input'); return;
+    }
+    if (from === 'F' && val < -459.67) {
+      errEl.textContent = 'Below absolute zero (−459.67°F) — not physically possible.';
+      inp.classList.add('error-input'); return;
+    }
+    clearError();
+
+    const celsius = toCelsius(val, from);
+    const result  = fromCelsius(celsius, to);
+
+    const area = document.getElementById('resultArea');
+    area.style.display = 'block';
+    area.style.animation = 'none';
+    void area.offsetWidth;
+    area.style.animation = 'slideUp 0.3s ease';
+
+    document.getElementById('resultFrom').textContent =
+      fmt(val) + sym[from] + '  →  ' + name[to];
+    document.getElementById('resultNumber').textContent = fmt(result);
+    document.getElementById('resultUnitLabel').textContent = name[to] + ' (' + sym[to] + ')';
+
+    const grid = document.getElementById('othersGrid');
+    grid.innerHTML = '';
+    ['C','F','K'].filter(u => u !== to).forEach(u => {
+      const v = fromCelsius(celsius, u);
+      const mc = document.createElement('div');
+      mc.className = 'mini';
+      mc.innerHTML =
+        '<div class="mini-label">' + name[u] + '</div>' +
+        '<div class="mini-value">' + fmt(v) + ' ' + sym[u] + '</div>';
+      grid.appendChild(mc);
+    });
+  }
+</script>
+
+</body>
+</html>
