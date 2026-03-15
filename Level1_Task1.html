@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeCraft — Learn Web Development</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0f0e;
+      --surface:   #111615;
+      --surface2:  #172120;
+      --accent:    #c8f55a;
+      --accent2:   #5affd6;
+      --text:      #e8ede8;
+      --muted:     #8a9c8a;
+      --border:    rgba(200,245,90,0.15);
+      --ff-head:   'Playfair Display', serif;
+      --ff-body:   'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ── HEADER / NAV ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 6vw;
+      background: rgba(11,15,14,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--ff-head);
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+    }
+    .logo span { color: var(--text); }
+
+    nav { display: flex; gap: 2.2rem; align-items: center; }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.5rem;
+      border-radius: 2rem;
+      font-family: var(--ff-body);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-outline {
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      background: transparent;
+    }
+    .btn-outline:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .btn-solid {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      font-weight: 600;
+    }
+    .btn-solid:hover {
+      background: #d9ff6f;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(200,245,90,0.3);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 6vw 6rem;
+      overflow: hidden;
+    }
+
+    /* decorative blobs */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,245,90,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      width: fit-content;
+      animation: fadeUp 0.6s ease both;
+    }
+    .tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      font-family: var(--ff-head);
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 14ch;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero p {
+      max-width: 50ch;
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-top: 1.8rem;
+      line-height: 1.8;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 5rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.7s 0.4s ease both;
+      flex-wrap: wrap;
+    }
+
+    .stat-val {
+      font-family: var(--ff-head);
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-top: 0.3rem;
+    }
+
+    /* ── SECTION SHARED ── */
+    section { position: relative; z-index: 1; }
+
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: var(--ff-head);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .section-body {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 48ch;
+      margin-top: 1rem;
+    }
+
+    /* ── WHAT YOU LEARN (3-col grid) ── */
+    .learn {
+      padding: 8rem 6vw;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .learn-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(200,245,90,0.35);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.35);
+    }
+
+    .card-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: rgba(200,245,90,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .card h3 {
+      font-family: var(--ff-head);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+    }
+    .card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── HOW IT WORKS (steps) ── */
+    .steps {
+      padding: 8rem 6vw;
+    }
+
+    .steps-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    .step-list { display: flex; flex-direction: column; gap: 0; margin-top: 3rem; }
+
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.8rem 0;
+      border-bottom: 1px solid var(--border);
+      cursor: default;
+      transition: padding-left 0.3s;
+    }
+    .step:hover { padding-left: 0.6rem; }
+    .step:first-child { border-top: 1px solid var(--border); }
+
+    .step-num {
+      font-family: var(--ff-head);
+      font-size: 0.8rem;
+      color: var(--accent);
+      min-width: 2rem;
+      padding-top: 3px;
+      font-weight: 700;
+    }
+    .step-content h4 { font-size: 1rem; font-weight: 500; margin-bottom: 0.3rem; }
+    .step-content p { font-size: 0.88rem; color: var(--muted); }
+
+    /* preview panel */
+    .preview-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .panel-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.2rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff6059; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .code-preview {
+      padding: 1.8rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 1.9;
+      color: var(--muted);
+    }
+    .code-preview .ck { color: #5affd6; }
+    .code-preview .cv { color: var(--accent); }
+    .code-preview .cs { color: #ff9f6b; }
+    .code-preview .cc { color: #888; font-style: italic; }
+
+    /* ── TOPICS ── */
+    .topics {
+      padding: 8rem 6vw;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 3.5rem;
+    }
+
+    .topic-pill {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.3rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.9rem;
+      font-weight: 400;
+      transition: all 0.25s;
+      cursor: default;
+    }
+    .topic-pill:hover {
+      border-color: var(--accent);
+      background: rgba(200,245,90,0.05);
+      color: var(--accent);
+    }
+    .topic-pill span { font-size: 1.2rem; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials { padding: 8rem 6vw; }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .testi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+
+    .stars { color: var(--accent); font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 1.2rem; }
+    .testi-card blockquote {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+    .testi-author { display: flex; align-items: center; gap: 0.8rem; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+    }
+    .author-name { font-size: 0.88rem; font-weight: 500; }
+    .author-role { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── CTA BAND ── */
+    .cta-band {
+      margin: 0 6vw 8rem;
+      background: var(--accent);
+      border-radius: 24px;
+      padding: 5rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-band::before {
+      content: '</>';
+      position: absolute;
+      right: 4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--ff-head);
+      font-size: 10rem;
+      font-weight: 900;
+      color: rgba(0,0,0,0.07);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .cta-band h2 {
+      font-family: var(--ff-head);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      color: var(--bg);
+      font-weight: 900;
+      line-height: 1.1;
+    }
+    .cta-band p {
+      color: rgba(11,15,14,0.65);
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-dark {
+      background: var(--bg);
+      color: var(--accent);
+      border: none;
+      font-weight: 600;
+      padding: 0.9rem 2.2rem;
+      font-size: 1rem;
+    }
+    .btn-dark:hover {
+      background: #0f1a18;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 5rem 6vw 2.5rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 4rem;
+    }
+
+    .footer-brand .logo { font-size: 1.3rem; }
+    .footer-brand p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 0.8rem;
+      line-height: 1.7;
+      max-width: 28ch;
+    }
+
+    .footer-col h5 {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+    .footer-col a {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      margin-bottom: 0.7rem;
+      opacity: 0.7;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .footer-col a:hover { opacity: 1; color: var(--accent); }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .topics-grid { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .steps-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .topics-grid { grid-template-columns: 1fr 1fr; }
+      nav { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .cta-band::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════ HEADER ════════════════ -->
+<header>
+  <div class="logo">Code<span>Craft</span></div>
+  <nav>
+    <a href="#learn">Curriculum</a>
+    <a href="#how">How It Works</a>
+    <a href="#topics">Topics</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#" class="btn btn-outline">Log In</a>
+  </nav>
+</header>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section class="hero">
+  <div class="tag">Beginner Friendly · HTML &amp; CSS</div>
+  <h1>Build the <em>Web</em> from Scratch</h1>
+  <p>Your first real project — a landing page — teaches you columns, sections, spacing, headers, footers, and the creative courage to make something beautiful.</p>
+  <div class="hero-cta">
+    <a href="#learn" class="btn btn-solid">Start Building →</a>
+    <a href="#how" class="btn btn-outline">See How It Works</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-val">6</div>
+      <div class="stat-label">Core Concepts</div>
+    </div>
+    <div>
+      <div class="stat-val">1</div>
+      <div class="stat-label">Real Project</div>
+    </div>
+    <div>
+      <div class="stat-val">0</div>
+      <div class="stat-label">Prerequisites</div>
+    </div>
+    <div>
+      <div class="stat-val">∞</div>
+      <div class="stat-label">Creative Freedom</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ WHAT YOU LEARN ════════════════ -->
+<section class="learn" id="learn">
+  <div class="learn-header">
+    <div>
+      <div class="section-label">Curriculum</div>
+      <h2 class="section-title">Everything in<br/>One Project</h2>
+    </div>
+    <p class="section-body">A landing page isn't just an exercise — it's a canvas. Each element you add teaches you something real about the web.</p>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <h3>HTML Structure</h3>
+      <p>Learn semantic tags like <code>&lt;header&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;footer&gt;</code>, and why structure matters before style.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📐</div>
+      <h3>CSS Layout</h3>
+      <p>Master Flexbox and CSS Grid to arrange items in rows, columns, and complex multi-area layouts without overlap.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h3>Color Palette</h3>
+      <p>Choose and apply a cohesive color scheme using CSS variables so your page feels intentional and polished.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔲</div>
+      <h3>Box Model</h3>
+      <p>Understand padding, margin, and borders — the invisible forces that give every element its breathing room.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✍️</div>
+      <h3>Typography</h3>
+      <p>Import fonts, set sizes, control line-height and letter-spacing to make your text readable and beautiful.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <h3>Responsiveness</h3>
+      <p>Use media queries to make your page look great on every screen — from mobile phones to large monitors.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ HOW IT WORKS ════════════════ -->
+<section class="steps" id="how">
+  <div class="steps-inner">
+    <div>
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How to Build<br/>Your Page</h2>
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>Sketch the Layout</h4>
+            <p>Draw your sections on paper. Decide what goes above the fold, what columns you need, and where the footer lives.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>Write the HTML Skeleton</h4>
+            <p>Create the semantic structure first — header, nav, sections, footer — with real content inside each tag.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>Apply Base Styles</h4>
+            <p>Reset defaults, pick fonts and colors, then style the header and footer before touching the inner sections.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>Build Each Section</h4>
+            <p>Use Flexbox or Grid per section. Tweak padding and margin until nothing overlaps and everything breathes.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <div class="step-content">
+            <h4>Polish &amp; Publish</h4>
+            <p>Add hover effects, refine spacing, test on mobile, then deploy to GitHub Pages or Netlify for free.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Preview Panel -->
+    <div class="preview-panel">
+      <div class="panel-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+      </div>
+      <div class="code-preview">
+        <span class="cc">/* --- Layout Skeleton --- */</span><br/><br/>
+        <span class="ck">header</span> {<br/>
+        &nbsp;&nbsp;<span class="cv">display</span>: flex;<br/>
+        &nbsp;&nbsp;<span class="cv">justify-content</span>: space-between;<br/>
+        &nbsp;&nbsp;<span class="cv">padding</span>: <span class="cs">1rem 6vw</span>;<br/>
+        }<br/><br/>
+        <span class="ck">.grid-3</span> {<br/>
+        &nbsp;&nbsp;<span class="cv">display</span>: grid;<br/>
+        &nbsp;&nbsp;<span class="cv">grid-template-columns</span>:<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="cs">repeat(3, 1fr)</span>;<br/>
+        &nbsp;&nbsp;<span class="cv">gap</span>: <span class="cs">1.5rem</span>;<br/>
+        }<br/><br/>
+        <span class="ck">footer</span> {<br/>
+        &nbsp;&nbsp;<span class="cv">border-top</span>: <span class="cs">1px solid #eee</span>;<br/>
+        &nbsp;&nbsp;<span class="cv">padding</span>: <span class="cs">3rem 6vw</span>;<br/>
+        &nbsp;&nbsp;<span class="cv">text-align</span>: center;<br/>
+        }<br/><br/>
+        <span class="cc">/* No overlap, ever ✓ */</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ TOPICS ════════════════ -->
+<section class="topics" id="topics">
+  <div class="section-label">What You'll Master</div>
+  <h2 class="section-title">Topic Checklist</h2>
+  <div class="topics-grid">
+    <div class="topic-pill"><span>🏷️</span> Semantic HTML</div>
+    <div class="topic-pill"><span>📦</span> Box Model</div>
+    <div class="topic-pill"><span>↔️</span> Flexbox</div>
+    <div class="topic-pill"><span>🔲</span> CSS Grid</div>
+    <div class="topic-pill"><span>🎨</span> CSS Variables</div>
+    <div class="topic-pill"><span>✍️</span> Google Fonts</div>
+    <div class="topic-pill"><span>📐</span> Padding &amp; Margin</div>
+    <div class="topic-pill"><span>🖼️</span> Columns &amp; Rows</div>
+    <div class="topic-pill"><span>🔝</span> Header &amp; Nav</div>
+    <div class="topic-pill"><span>🔻</span> Footer Layout</div>
+    <div class="topic-pill"><span>📱</span> Media Queries</div>
+    <div class="topic-pill"><span>🌊</span> Hover Effects</div>
+  </div>
+</section>
+
+<!-- ════════════════ TESTIMONIALS ════════════════ -->
+<section class="testimonials" id="reviews">
+  <div class="section-label">Student Reviews</div>
+  <h2 class="section-title">Built by Beginners,<br/>Loved by Everyone</h2>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"I had zero knowledge of CSS grid. After building my landing page I finally understood why padding and margin are different. It clicked instantly."</blockquote>
+      <div class="testi-author">
+        <div class="avatar">😊</div>
+        <div>
+          <div class="author-name">Priya Sharma</div>
+          <div class="author-role">Frontend Intern · Pune</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"The best part? I could be creative. I chose my own colors, fonts, and layout. It didn't feel like homework — it felt like making something that's mine."</blockquote>
+      <div class="testi-author">
+        <div class="avatar">🧑</div>
+        <div>
+          <div class="author-name">Arjun Mehta</div>
+          <div class="author-role">CS Student · Year 2</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"I struggled with overlapping elements for days. Then I learned about the box model and flexbox — everything snapped into place perfectly."</blockquote>
+      <div class="testi-author">
+        <div class="avatar">👩</div>
+        <div>
+          <div class="author-name">Mansi Desai</div>
+          <div class="author-role">Beginner Developer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ CTA BAND ════════════════ -->
+<div class="cta-band">
+  <div>
+    <h2>Ready to build<br/>your first page?</h2>
+    <p>Open a text editor. Type &lt;!DOCTYPE html&gt;. Begin.</p>
+  </div>
+  <a href="#learn" class="btn btn-dark btn-solid">Start for Free →</a>
+</div>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">Code<span>Craft</span></div>
+      <p>Learn web development by building real things. No fluff, no prerequisites — just you and a blank HTML file.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Learn</h5>
+      <a href="#">HTML Basics</a>
+      <a href="#">CSS Fundamentals</a>
+      <a href="#">Flexbox Guide</a>
+      <a href="#">CSS Grid</a>
+    </div>
+    <div class="footer-col">
+      <h5>Projects</h5>
+      <a href="#">Landing Page</a>
+      <a href="#">Portfolio Site</a>
+      <a href="#">Blog Layout</a>
+      <a href="#">Dashboard UI</a>
+    </div>
+    <div class="footer-col">
+      <h5>Resources</h5>
+      <a href="#">Cheat Sheets</a>
+      <a href="#">Color Tools</a>
+      <a href="#">Font Pairings</a>
+      <a href="#">Community</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 CodeCraft. Made with HTML &amp; CSS 💚</span>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
